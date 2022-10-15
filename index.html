@@ -1,68 +1,424 @@
-<!--
+<head>
+  <style>
+    /* why am I doing this!? */
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500&display=swap');
+    body {
+      background: rgb(0,0,0);
+      background: -moz-radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(30,61,71,1) 100%);
+      background: -webkit-radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(30,61,71,1) 100%);
+      background: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(30,61,71,1) 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#000000",endColorstr="#1e3d47",GradientType=1);
 
-Follow me on
-Dribbble: https://dribbble.com/supahfunk
-Twitter: https://twitter.com/supahfunk
-Codepen: https://codepen.io/supah/
+  <body>
+<div class="items">Mauricio 1</div>
+ <div class="items">Lupe 2</div>
+ <div class="items">Evila 3</div>
+    </body>
 
--->
-<div class="leaderboard">
-  <h1>
-    <svg class="ico-cup">
-      <use xlink:href="#cup"></use>
-    </svg>
-    Most active Players
-  </h1>
-  <ol>
-    <li>
-      <mark>Jerry Wood</mark>
-      <small>315</small>
-    </li>
-    <li>
-      <mark>Brandon Barnes</mark>
-      <small>301</small>
-    </li>
-    <li>
-      <mark>Raymond Knight</mark>
-      <small>292</small>
-    </li>
-    <li>
-      <mark>Trevor McCormick</mark>
-      <small>245</small>
-    </li>
-    <li>
-      <mark>Andrew Fox</mark>
-      <small>203</small>
-    </li>
-  </ol>
-</div>
+<script>
+  // Array to store our Snowflake objects
+  var snowflakes = [];
+
+  // Global variables to store our browser's window size
+  var browserWidth;
+  var browserHeight;
+
+  // Specify the number of snowflakes you want visible
+  var numberOfSnowflakes = 50;
+
+  // Flag to reset the position of the snowflakes
+  var resetPosition = false;
+
+  // Handle accessibility
+  var enableAnimations = false;
+  var reduceMotionQuery = matchMedia("(prefers-reduced-motion)");
+
+  // Handle animation accessibility preferences 
+  function setAccessibilityState() {
+    if (reduceMotionQuery.matches) {
+      enableAnimations = false;
+    } else { 
+      enableAnimations = true;
+    }
+  }
+  setAccessibilityState();
+
+  reduceMotionQuery.addListener(setAccessibilityState);
+
+  //
+  // It all starts here...
+  //
+  function setup() {
+    if (enableAnimations) {
+      window.addEventListener("DOMContentLoaded", generateSnowflakes, false);
+      window.addEventListener("resize", setResetFlag, false);
+    }
+
+ .snowflake {
+      color: #fff;
+      font-size: 1em;
+      font-family: Arial, sans-serif;
+      text-shadow: 0 0 5px #000;
+  }
+  setup();
+
+  //
+  // Constructor for our Snowflake object
+  //
+  function Snowflake(element, speed, xPos, yPos) {
+    // set initial snowflake properties
+    this.element = element;
+    this.speed = speed;
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.scale = 1;
+
+    // declare variables used for snowflake's motion
+    this.counter = 0;
+    this.sign = Math.random() < 0.5 ? 1 : -1;
+
+    // setting an initial opacity and size for our snowflake
+    this.element.style.opacity = (.1 + Math.random()) / 3;
+  }
+
+  //
+  // The function responsible for actually moving our snowflake
+  //
+  Snowflake.prototype.update = function () {
+    // using some trigonometry to determine our x and y position
+    this.counter += this.speed / 5000;
+    this.xPos += this.sign * this.speed * Math.cos(this.counter) / 40;
+    this.yPos += Math.sin(this.counter) / 40 + this.speed / 30;
+    this.scale = .5 + Math.abs(10 * Math.cos(this.counter) / 20);
+
+    // setting our snowflake's position
+    setTransform(Math.round(this.xPos), Math.round(this.yPos), this.scale, this.element);
+
+    // if snowflake goes below the browser window, move it back to the top
+    if (this.yPos > browserHeight) {
+      this.yPos = -50;
+    }
+    @-webkit-keyframes snowflakes-fall{
+      0%{
+        top:-10%}
+      100%{
+        top:100%}
+  }
+
+  //
+  // A performant way to set your snowflake's position and size
+  //
+  function setTransform(xPos, yPos, scale, el) {
+    el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0) scale(${scale}, ${scale})`;
+  }
+
+  //
+  // The function responsible for creating the snowflake
+  //
+  function generateSnowflakes() {
+
+    // get our snowflake element from the DOM and store it
+    var originalSnowflake = document.querySelector(".snowflake");
+
+    // access our snowflake element's parent container
+    var snowflakeContainer = originalSnowflake.parentNode;
+    snowflakeContainer.style.display = "block";
+
+    // get our browser's size
+    browserWidth = document.documentElement.clientWidth;
+    browserHeight = document.documentElement.clientHeight;
+
+    // create each individual snowflake
+    for (var i = 0; i < numberOfSnowflakes; i++) {
+
+      // clone our original snowflake and add it to snowflakeContainer
+      var snowflakeClone = originalSnowflake.cloneNode(true);
+      snowflakeContainer.appendChild(snowflakeClone);
+
+      // set our snowflake's initial position and related properties
+      var initialXPos = getPosition(50, browserWidth);
+      var initialYPos = getPosition(50, browserHeight);
+      var speed = 5 + Math.random() * 40;
+
+      // create our Snowflake object
+      var snowflakeObject = new Snowflake(snowflakeClone,
+        speed,
+        initialXPos,
+        initialYPos);
+      snowflakes.push(snowflakeObject);
+    }
+    @-webkit-keyframes snowflakes-shake{
+      0%,100%{
+        -webkit-transform:translateX(0);
+        transform:translateX(0)}
+      50%{
+        -webkit-transform:translateX(80px);
+        transform:translateX(80px)}
+
+    // remove the original snowflake because we no longer need it visible
+    snowflakeContainer.removeChild(originalSnowflake);
+
+    moveSnowflakes();
+  }
+
+  //
+  // Responsible for moving each snowflake by calling its update function
+  //
+  function moveSnowflakes() {
+
+    if (enableAnimations) {
+      for (var i = 0; i < snowflakes.length; i++) {
+        var snowflake = snowflakes[i];
+        snowflake.update();
+      }      
+    }
+    @keyframes snowflakes-fall{
+      0%{
+        top:-10%}
+      100%{
+        top:100%}
+
+    // Reset the position of all the snowflakes to a new value
+    if (resetPosition) {
+      browserWidth = document.documentElement.clientWidth;
+      browserHeight = document.documentElement.clientHeight;
+
+      for (var i = 0; i < snowflakes.length; i++) {
+        var snowflake = snowflakes[i];
+
+        snowflake.xPos = getPosition(50, browserWidth);
+        snowflake.yPos = getPosition(50, browserHeight);
+      }
+
+      resetPosition = false;
+    }
+    @keyframes snowflakes-shake{
+      0%,100%{
+        transform:translateX(0)}
+      50%{
+        transform:translateX(80px)}
+
+    requestAnimationFrame(moveSnowflakes);
+  }
+
+  //
+  // This function returns a number between (maximum - offset) and (maximum + offset)
+  //
+  function getPosition(offset, size) {
+    return Math.round(-1 * offset + Math.random() * (size + 2 * offset));
+  }
+
+  //
+  // Trigger a reset of all the snowflakes' positions
+  //
+  function setResetFlag(e) {
+    resetPosition = true;
+  }
 
 
-<svg style="display: none;">
-  <symbol id="cup" x="0px" y="0px"
-	 width="25px" height="26px" viewBox="0 0 25 26" enable-background="new 0 0 25 26" xml:space="preserve">
-<path fill="#F26856" d="M21.215,1.428c-0.744,0-1.438,0.213-2.024,0.579V0.865c0-0.478-0.394-0.865-0.88-0.865H6.69
-	C6.204,0,5.81,0.387,5.81,0.865v1.142C5.224,1.641,4.53,1.428,3.785,1.428C1.698,1.428,0,3.097,0,5.148
-	C0,7.2,1.698,8.869,3.785,8.869h1.453c0.315,0,0.572,0.252,0.572,0.562c0,0.311-0.257,0.563-0.572,0.563
-	c-0.486,0-0.88,0.388-0.88,0.865c0,0.478,0.395,0.865,0.88,0.865c0.421,0,0.816-0.111,1.158-0.303
-	c0.318,0.865,0.761,1.647,1.318,2.31c0.686,0.814,1.515,1.425,2.433,1.808c-0.04,0.487-0.154,1.349-0.481,2.191
-	c-0.591,1.519-1.564,2.257-2.975,2.257H5.238c-0.486,0-0.88,0.388-0.88,0.865v4.283c0,0.478,0.395,0.865,0.88,0.865h14.525
-	c0.485,0,0.88-0.388,0.88-0.865v-4.283c0-0.478-0.395-0.865-0.88-0.865h-1.452c-1.411,0-2.385-0.738-2.975-2.257
-	c-0.328-0.843-0.441-1.704-0.482-2.191c0.918-0.383,1.748-0.993,2.434-1.808c0.557-0.663,1-1.445,1.318-2.31
-	c0.342,0.192,0.736,0.303,1.157,0.303c0.486,0,0.88-0.387,0.88-0.865c0-0.478-0.394-0.865-0.88-0.865
-	c-0.315,0-0.572-0.252-0.572-0.563c0-0.31,0.257-0.562,0.572-0.562h1.452C23.303,8.869,25,7.2,25,5.148
-	C25,3.097,23.303,1.428,21.215,1.428z M5.238,7.138H3.785c-1.116,0-2.024-0.893-2.024-1.99c0-1.097,0.908-1.99,2.024-1.99
-	c1.117,0,2.025,0.893,2.025,1.99v2.06C5.627,7.163,5.435,7.138,5.238,7.138z M18.883,21.717v2.553H6.118v-2.553H18.883
-	L18.883,21.717z M13.673,18.301c0.248,0.65,0.566,1.214,0.947,1.686h-4.24c0.381-0.472,0.699-1.035,0.947-1.686
-	c0.33-0.865,0.479-1.723,0.545-2.327c0.207,0.021,0.416,0.033,0.627,0.033c0.211,0,0.42-0.013,0.627-0.033
-	C13.195,16.578,13.344,17.436,13.673,18.301z M12.5,14.276c-2.856,0-4.93-2.638-4.93-6.273V1.73h9.859v6.273
-	C17.43,11.638,15.357,14.276,12.5,14.276z M21.215,7.138h-1.452c-0.197,0-0.39,0.024-0.572,0.07v-2.06
-	c0-1.097,0.908-1.99,2.024-1.99c1.117,0,2.025,0.893,2.025,1.99C23.241,6.246,22.333,7.138,21.215,7.138z"/>
-      </symbol>
-</svg>
+
+    window.onload = function() {
+      countUpFromTime("Dec 19, 2021 03:00:00", 'countup1');
+    };
+    function countUpFromTime(countFrom, id) {
+      countFrom = new Date(countFrom).getTime();
+      var now = new Date(),
+          countFrom = new Date(countFrom),
+          timeDifference = (now - countFrom);
+      var secondsInADay = 60 * 60 * 1000 * 24,
+          secondsInAHour = 60 * 60 * 1000;
+      days = Math.floor(timeDifference / (secondsInADay) * 1);
+      hours = Math.floor((timeDifference % (secondsInADay)) / (secondsInAHour) * 1);
+      mins = Math.floor(((timeDifference % (secondsInADay)) % (secondsInAHour)) / (60 * 1000) * 1);
+      secs = Math.floor((((timeDifference % (secondsInADay)) % (secondsInAHour)) % (60 * 1000)) / 1000 * 1);
+      var idEl = document.getElementById(id);
+      idEl.getElementsByClassName('days')[0].innerHTML = days;
+      idEl.getElementsByClassName('hours')[0].innerHTML = hours;
+      idEl.getElementsByClassName('minutes')[0].innerHTML = mins;
+      idEl.getElementsByClassName('seconds')[0].innerHTML = secs;
+      clearTimeout(countUpFromTime.interval);
+      countUpFromTime.interval = setTimeout(function(){
+        countUpFromTime(countFrom, id);
+      }
+                                            , 1000);
+    }
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500&display=swap');
+    body {
+background: rgb(0,0,0);
+background: -moz-radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(30,61,71,1) 100%);
+background: -webkit-radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(30,61,71,1) 100%);
+background: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(30,61,71,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#000000",endColorstr="#1e3d47",GradientType=1);
+      }
 
 
-<a class="the-most" target="_blank" href="https://codepen.io/2016/popular/pens/8/">
-  <img src="https://raw.githubusercontent.com/supahfunk/supah-codepen/master/themost-2016.png">
-</a>
+.snowflake{
+      position:fixed;
+      top:-10%;
+      z-index:9999;
+      -webkit-user-select:none;
+      -moz-user-select:none;
+      -ms-user-select:none;
+      user-select:none;
+      cursor:default;
+      -webkit-animation-name:snowflakes-fall,snowflakes-shake;
+      -webkit-animation-duration:10s,3s;
+      -webkit-animation-timing-function:linear,ease-in-out;
+      -webkit-animation-iteration-count:infinite,infinite;
+      -webkit-animation-play-state:running,running;
+      animation-name:snowflakes-fall,snowflakes-shake;
+      animation-duration:10s,3s;
+      animation-timing-function:linear,ease-in-out;
+      animation-iteration-count:infinite,infinite;
+      animation-play-state:running,running}
+    .snowflake:nth-of-type(0){
+      left:1%;
+      -webkit-animation-delay:0s,0s;
+      animation-delay:0s,0s}
+    .snowflake:nth-of-type(1){
+      left:10%;
+      -webkit-animation-delay:1s,1s;
+      animation-delay:1s,1s}
+    .snowflake:nth-of-type(2){
+      left:20%;
+      -webkit-animation-delay:6s,.5s;
+      animation-delay:6s,.5s}
+    .snowflake:nth-of-type(3){
+      left:30%;
+      -webkit-animation-delay:4s,2s;
+      animation-delay:4s,2s}
+    .snowflake:nth-of-type(4){
+      left:40%;
+      -webkit-animation-delay:2s,2s;
+      animation-delay:2s,2s}
+    .snowflake:nth-of-type(5){
+      left:50%;
+      -webkit-animation-delay:8s,3s;
+      animation-delay:8s,3s}
+    .snowflake:nth-of-type(6){
+      left:60%;
+      -webkit-animation-delay:6s,2s;
+      animation-delay:6s,2s}
+    .snowflake:nth-of-type(7){
+      left:70%;
+      -webkit-animation-delay:2.5s,1s;
+      animation-delay:2.5s,1s}
+    .snowflake:nth-of-type(8){
+      left:80%;
+      -webkit-animation-delay:1s,0s;
+      animation-delay:1s,0s}
+    .snowflake:nth-of-type(9){
+      left:90%;
+      -webkit-animation-delay:3s,1.5s;
+      animation-delay:3s,1.5s}
+    .snowflake:nth-of-type(10){
+      left:25%;
+      -webkit-animation-delay:2s,0s;
+      animation-delay:2s,0s}
+    .snowflake:nth-of-type(11){
+      left:65%;
+      -webkit-animation-delay:4s,2.5s;
+      animation-delay:4s,2.5s}
+/* meat goes here */
+  .countup {
 
+
+#snowflakeContainer {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    display: none;
+  }
+
+  .snowflake {
+    position: fixed;
+    background-color: #CCC;
+    user-select: none;
+    z-index: 1000;
+    pointer-events: none;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+  }
+
+
+
+    .countup {
+      font-family: "Cinzel";
+      font-size: 4vw;
+      position: absolute;
+@@ -204,69 +351,6 @@
+      countUpFromTime.interval = setTimeout(function(){
+        countUpFromTime(countFrom, id);
+      }
+                                            , 1000);
+                                             ,1000);
+    }
+  </script>
+</head>
+<body>
+  <div class="snowflakes" aria-hidden="true">
+    <div class="snowflake">
+      ❅
+    </div>
+    <div class="snowflake">
+      ❆
+    </div>
+    <div class="snowflake">
+      ❅
+    </div>
+    <div class="snowflake">
+      ❆
+    </div>
+    <div class="snowflake">
+      ❅
+    </div>
+    <div class="snowflake">
+      ❆
+    </div>
+    <div class="snowflake">
+      ❅
+    </div>
+    <div class="snowflake">
+      ❆
+    </div>
+    <div class="snowflake">
+      ❅
+    </div>
+    <div class="snowflake">
+      ❆
+    </div>
+    <div class="snowflake">
+      ❅
+    </div>
+    <div class="snowflake">
+      ❆
+    </div>
+  </div>
+
+
+  <div class="countup" id="countup1">
+    <span class="timeel days">00
+    </span>
+    <span class="timeel timeRefDays">days
+    </span>
+    <span class="timeel hours">00
+    </span>
+    <span class="timeel timeRefHours">hours
+    </span>
+    <span class="timeel minutes">00
+    </span>
+    <span class="timeel timeRefMinutes">minutes
+    </span>
+    <span class="timeel seconds">00
+    </span>
+    <span class="timeel timeRefSeconds">seconds
+      <br>since our last Nutcracker
+    </span>
+  </div>
+</body
+<!-- bloody forkin shirt! --/>
+  </style>
